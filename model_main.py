@@ -20,9 +20,27 @@ import click
 
 from models import *
 from tqdm import tqdm
-from utils import count_parameters, get_dataset
-
+from utils import count_parameters, get_dataset, get_model
+from optimizers import inna
 from lr_backtrack import LRFinder, change_lr
+
+
+def get_backtracking_params(op_name):
+    if op_name == 'SGD':
+        alpha = 1e-4
+        once_only = True
+        apply = True
+    elif op_name == 'MMT':
+        alpha = 1e-4
+        once_only = False
+        apply = True
+    elif op_name == 'NAG':
+        alpha = 1e-4
+        once_only = False
+        apply = True
+    else:
+        return None, None, None
+    return alpha, once_only, apply
 
 
 @click.command()
@@ -58,24 +76,7 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
 
     # Loop for model architetures
     for net_name in nets:
-        if net_name == 'ResNet18':
-            net = ResNet18(num_classes)
-        elif net_name == 'MobileNetV2':
-            net = MobileNetV2(num_classes=num_classes)
-        elif net_name == 'SENet18':
-            net = SENet18(num_classes=num_classes)
-        elif net_name == 'PreActResNet18':
-            net = PreActResNet18(num_classes=num_classes)
-        elif net_name == 'DenseNet121':
-            net = DenseNet121(num_classes=num_classes)
-        elif net_name == 'LeNet':
-            net = LeNet(num_classes=num_classes)
-        elif net_name == 'GoogLeNet':
-            net = GoogLeNet(num_classes=num_classes)
-        elif net_name == 'ShuffleNet':
-            net = ShuffleNetV2(num_classes=num_classes)
-        elif net_name == 'VGG':
-            net = VGG(vgg_name='VGG11', num_classes=num_classes)
+        net = get_model(net_name, num_classes)
 
         print('Dataset:', dataset)
         print('Model:', net_name)
@@ -99,19 +100,8 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
             'NAG': optim.SGD(net.parameters(), lr=lr_start, momentum=momentum, nesterov=True),
         }
         # Loop for optimizers:
-        for op_name in optimizers:
-            if op_name == 'SGD':
-                alpha = 1e-4
-                once_only = True
-                apply = True
-            elif op_name == 'MMT':
-                alpha = 1e-4
-                once_only = False
-                apply = True
-            elif op_name == 'NAG':
-                alpha = 1e-4
-                once_only = False
-                apply = True
+        for op_name in optimizers.keys():
+            alpha, once_only, apply = get_backtracking_params(op_name)
             optimizer = optimizers[op_name]
 
             # Global variables
@@ -145,7 +135,7 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
                     print('Saving initialized weights to %s' % weights_init)  # save initial weights
                     torch.save(net.state_dict(), weights_init)
 
-                    # Define gradient descent optimizer for backtracking process
+            # Define gradient descent optimizer for backtracking process
             if use_backtracking:
                 optimizer_BT = optim.SGD(net.parameters(), lr=lr_start)
                 lr_finder_BT = LRFinder(net, optimizer_BT, criterion, device="cuda")
@@ -192,7 +182,8 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
                     loss_avg = train_loss / (batch_idx + 1)
 
                     pbar.set_description(f"Batch: %d/%d | Loss: %.3f | Acc: %.3f%% (%d/%d)| LR: %.7f" %
-                                         (batch_idx, len(trainloader), loss_avg, acc, correct, total, optimizer.param_groups[0]['lr']))
+                                         (batch_idx, len(trainloader), loss_avg, acc, correct, total,
+                                          optimizer.param_groups[0]['lr']))
 
                 history['acc_train'].append(acc)
                 history['loss_train'].append(loss_avg)
@@ -228,7 +219,8 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
                         loss_avg = test_loss / (batch_idx + 1)
 
                         pbar.set_description(f"Batch: %d/%d | Loss: %.3f | Acc: %.3f%% (%d/%d)" %
-                                             (batch_idx, len(testloader), loss_avg, 100. * correct / total, correct, total))
+                                             (batch_idx, len(testloader), loss_avg, 100. * correct / total, correct,
+                                              total))
 
                 history['acc_valid'].append(acc)
                 history['loss_valid'].append(loss_avg)

@@ -14,10 +14,32 @@ import torch.nn.init as init
 import torchvision
 import torchvision.transforms as transforms
 
+from models import *
+
 
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+
+def get_model(net_name, num_classes):
+    if net_name == 'ResNet18':
+        return ResNet18(num_classes)
+    elif net_name == 'MobileNetV2':
+        return MobileNetV2(num_classes=num_classes)
+    elif net_name == 'SENet18':
+        return SENet18(num_classes=num_classes)
+    elif net_name == 'PreActResNet18':
+        return PreActResNet18(num_classes=num_classes)
+    elif net_name == 'DenseNet121':
+        return DenseNet121(num_classes=num_classes)
+    elif net_name == 'LeNet':
+        return LeNet(num_classes=num_classes)
+    elif net_name == 'GoogLeNet':
+        return GoogLeNet(num_classes=num_classes)
+    elif net_name == 'ShuffleNet':
+        return ShuffleNetV2(num_classes=num_classes)
+    elif net_name == 'VGG':
+        return VGG(vgg_name='VGG11', num_classes=num_classes)
 
 def get_dataset(dataset, batch_size):
     print('==> Preparing data..')
