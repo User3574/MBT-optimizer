@@ -40,6 +40,9 @@ def get_model(net_name, num_classes):
         return ShuffleNetV2(num_classes=num_classes)
     elif net_name == 'VGG':
         return VGG(vgg_name='VGG11', num_classes=num_classes)
+    elif net_name == 'NIN':
+        return NIN(num_classes=num_classes)
+
 
 def get_dataset(dataset, batch_size):
     print('==> Preparing data..')

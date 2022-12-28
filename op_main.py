@@ -32,11 +32,13 @@ import json, pickle, click
 @click.option('--net_name', default='ResNet18',
               help="Choose specific network architecture: "
                    "ResNet18, MobileNetV2, SENet18, PreActResNet18, DenseNet121, LeNet, "
-                   "GoogLeNet, ShuffleNet, VGG")
-@click.option('--dataset', default='FashionMNIST', required=True, help='Dataset to evaluate',
+                   "GoogLeNet, ShuffleNet, VGG, NIN")
+@click.option('--dataset', default='CIFAR10', required=True, help='Dataset to evaluate',
               type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST']))
 def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_name, dataset):
     global best_loss, loss_avg, history, patient_test, patient_train, patient, optimizer, apply, alpha, best_acc
+    all_lr_starts = [100, 10, 1, 0.1, 0.01, 0.001, 1e-4, 1e-5, 1e-6]
+
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # number of epochs waiting for improvement of best_acc or best_loss
@@ -96,7 +98,7 @@ def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_nam
 
     all_history = {}
     # loop for different starting learning rates and optimizers
-    for lr_start in [100, 10, 1, 0.1, 0.01, 0.001, 1e-4, 1e-5, 1e-6]:
+    for lr_start in all_lr_starts:
         all_history[lr_start] = {}
         for op_name in optimizers:
             patient_train = 0
