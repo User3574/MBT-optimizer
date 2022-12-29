@@ -55,7 +55,7 @@ def get_backtracking_params(op_name):
 @click.option('--resume', default=False, help='Resume from checkpoint')
 @click.option('--nets', default='LeNet', callback=lambda _, __, x: x.split(',') if x else [],
               help="Choose specific network architecture: "
-                   "ResNet18, MobileNetV2, SENet18, PreActResNet18, DenseNet121, LeNet, "
+                   "ResNet18, ResNet34, MobileNetV2, SENet18, PreActResNet18, DenseNet121, LeNet, "
                    "GoogLeNet, ShuffleNet, VGG, NIN")
 @click.option('--dataset', default='FashionMNIST', required=True, help='Dataset to evaluate',
               type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST']))

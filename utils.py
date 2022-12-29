@@ -24,6 +24,8 @@ def count_parameters(model):
 def get_model(net_name, num_classes):
     if net_name == 'ResNet18':
         return ResNet18(num_classes)
+    elif net_name == 'ResNet34':
+        return ResNet34(num_classes)
     elif net_name == 'MobileNetV2':
         return MobileNetV2(num_classes=num_classes)
     elif net_name == 'SENet18':
