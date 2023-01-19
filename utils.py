@@ -8,6 +8,7 @@ import os
 import sys
 import time
 import torch
+import shutil
 
 import torch.nn as nn
 import torch.nn.init as init
@@ -179,10 +180,12 @@ def init_params(net):
                 init.constant(m.bias, 0)
 
 
-if os.name != 'nt':
-    _, term_width = os.popen('stty size', 'r').read().split()
-    term_width = int(term_width)
+# if os.name != 'nt':
+#     _, term_width = shutil.get_terminal_size()
+#     _, term_width = os.popen('stty size', 'r').read().split()
+#     term_width = int(term_width)
 
+term_width = 80
 TOTAL_BAR_LENGTH = 65.
 last_time = time.time()
 begin_time = last_time

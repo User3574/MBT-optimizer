@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
 
+import time
 import numpy as np
 import os
 
@@ -118,7 +119,8 @@ def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_nam
                     print('Saving initialized weights to %s' % weights_init)
                     torch.save(net.state_dict(), weights_init)
 
-            history = {'lr': [], 'acc_train': [], 'acc_valid': [], 'loss_train': [], 'loss_valid': []}
+            history = {'lr': [], 'acc_train': [], 'acc_valid': [], 'loss_train': [], 'loss_valid': [],
+                       'train_time': [], 'valid_time': []}
 
             # Training
             def train(epoch):
@@ -203,8 +205,17 @@ def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_nam
             # Main loop for training and testing with early stopping
             for epoch in range(start_epoch, 200):
                 if patient < 50:
+                    # Measure training time
+                    start = time.time()
                     train(epoch)
+                    end = time.time()
+                    history['train_time'] = end - start
+
+                    # Measure testing time
+                    start = time.time()
                     test(epoch)
+                    end = time.time()
+                    history['valid_time'] = end - start
 
                     all_history[lr_start][op_name] = history
                     json.dump(history, open(history_path, 'w'), indent=4)
