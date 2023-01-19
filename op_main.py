@@ -65,9 +65,9 @@ def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_nam
     if not os.path.isdir(save_dir):
         os.mkdir(save_dir)
 
-    weights_init = save_dir + net_name + '_CF' + str(num_classes) + '_init.t7'  # initial weights path
-    weights_best = save_dir + net_name + '_CF' + str(num_classes) + '_best.t7'  # best weights path
-    history_path = save_dir + net_name + '_CF' + str(num_classes) + '_history.json'  # history path
+    weights_init = save_dir + net_name + '_d' + str(dataset) + '_b' + str(batch_size) + '_init.t7'  # initial weights path
+    weights_best = save_dir + net_name + '_d' + str(dataset) + '_b' + str(batch_size) + '_best.t7'  # best weights path
+    history_path = save_dir + net_name + '_d' + str(dataset) + '_b' + str(batch_size) + '_history.json'  # history path
 
     # CUDA device
     if device == 'cuda':
@@ -219,10 +219,11 @@ def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_nam
 
                     all_history[lr_start][op_name] = history
                     json.dump(history, open(history_path, 'w'), indent=4)
-                    json.dump(all_history, open("history/optimizers/all_optimizers_cifar%d.json" % (num_classes), 'w'),
+                    json.dump(all_history,
+                              open(f"history/optimizers/all_optimizers{str(net_name)}_d{str(dataset)}_b{str(batch_size)}.json", 'w'),
                               indent=4)
                     pickle.dump(all_history,
-                                open("history/optimizers/all_optimizers_cifar%d.pickle" % (num_classes), 'wb'))
+                                open(f"history/optimizers/all_optimizers{str(net_name)}_d{str(dataset)}_b{str(batch_size)}.pickle", 'wb'))
 
 
 if __name__ == '__main__':
