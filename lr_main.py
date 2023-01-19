@@ -60,7 +60,8 @@ def run_experiments(lr_justified, alpha, beta, num_iter, resume, net_name, datas
     save_dir = save_path + net_name + '/'
     if not os.path.isdir(save_dir):
         os.mkdir(save_dir)
-    weights_best = save_dir + net_name + '_CF' + str(num_classes) + '_best.t7'
+
+    weights_best = save_dir + net_name + '_d' + str(dataset) + '_best.t7'
 
     # cuda device
     if device == 'cuda':
@@ -91,9 +92,9 @@ def run_experiments(lr_justified, alpha, beta, num_iter, resume, net_name, datas
 
             lr_finder_BT.backtrack(trainloader, alpha=alpha, beta=beta, num_iter=num_iter, lr_justified=lr_justified)
             lr_full[batch_size][lr_start] = lr_finder_BT.lr_BT
-    
-            json.dump(lr_full, open("history/lr/lr_full_cifar%d.json" % num_classes, 'w'), indent=4)
-            pickle.dump(lr_full, open('history/lr/lr_full_cifar%d.pickle' % num_classes, 'wb'))
+
+            json.dump(lr_full, open(f"history/lr/lr_full{str(net_name)}_d{str(dataset)}.json", 'w'), indent=4)
+            pickle.dump(lr_full, open(f"history/lr/lr_full{str(net_name)}_d{str(dataset)}.pickle", 'wb'))
     
     # print result
     print('Learning rate finding result using Backtracking line search with different batch sizes:')

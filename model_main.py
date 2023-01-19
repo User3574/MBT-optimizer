@@ -87,8 +87,8 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
         if not os.path.isdir(save_dir):
             os.mkdir(save_dir)
 
-        weights_init = save_dir + net_name + '_cifar' + str(num_classes) + '_init.t7'
-        weights_best = save_dir + net_name + '_cifar' + str(num_classes) + '_best.t7'
+        weights_init = save_dir + net_name + '_d' + str(dataset) + '_b' + str(batch_size) + '_init.t7'
+        weights_best = save_dir + net_name + '_d' + str(dataset) + '_b' + str(batch_size) + '_best.t7'
 
         if device == 'cuda':
             net = torch.nn.DataParallel(net)
@@ -105,7 +105,7 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
             optimizer = optimizers[op_name]
 
             # Global variables
-            history_path = save_dir + net_name + '_CF' + str(num_classes) + '_history_MBT-' + op_name + '.json'
+            history_path = save_dir + net_name + '_d' + str(dataset) + '_b' + str(batch_size) + '_history_MBT-' + op_name + '.json'
             patient_train = 0  # number of epochs waiting for improvement of training loss
             patient_test = 0  # number of epochs waiting for improvement of validation accuracy
             patient = 0  # basically min of patient_train and  patient_test
@@ -252,7 +252,7 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
 
                     all_history[op_name][lr_start] = history
                     json.dump(history, open(history_path, 'w'), indent=2)
-                    json.dump(all_history, open("history/models/all_models_cifar%d.pickle" % num_classes, 'w'),
+                    json.dump(all_history, open(f"history/models/all_models{str(net_name)}_d{str(dataset)}_b{str(batch_size)}.pickle", 'w'),
                               indent=2)
 
 
