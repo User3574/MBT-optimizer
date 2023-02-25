@@ -45,6 +45,8 @@ def get_model(net_name, num_classes):
         return VGG(vgg_name='VGG11', num_classes=num_classes)
     elif net_name == 'NIN':
         return NIN(num_classes=num_classes)
+    elif net_name == 'AlexNet':
+        return AlexNet(num_classes=num_classes)
 
 
 def get_dataset(dataset, batch_size):

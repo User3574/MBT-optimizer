@@ -33,7 +33,7 @@ import json, pickle, click
 @click.option('--net_name', default='ResNet18',
               help="Choose specific network architecture: "
                    "ResNet18, ResNet34, MobileNetV2, SENet18, PreActResNet18, DenseNet121, LeNet, "
-                   "GoogLeNet, ShuffleNet, VGG, NIN")
+                   "GoogLeNet, ShuffleNet, VGG, NIN, AlexNet")
 @click.option('--dataset', default='CIFAR10', required=True, help='Dataset to evaluate',
               type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST']))
 def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_name, dataset):
