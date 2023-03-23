@@ -17,12 +17,12 @@ import os
 import collections
 import json
 import click
-from wandb.beta.workflows import use_model
 
+from functorch import hessian, make_functional
+from torch.nn.utils import _stateless
 from models import *
 from tqdm import tqdm
 from utils import count_parameters, get_dataset, get_model
-from optimizers import inna
 from lr_backtrack import LRFinder, change_lr
 
 
@@ -48,7 +48,7 @@ def get_backtracking_params(op_name):
 @click.option('--start_epoch', default=0, help='Starting epoch')
 @click.option('--batch_size', default=200, help='Batch size')
 @click.option('--lr_start', default=100, help='Start learning rate')
-@click.option('--use_backtracking', default=True, help='Using backtracking or not')
+@click.option('--use_backtracking', default=False, help='Using backtracking or not')
 @click.option('--lr_justified', default=True, help='Is lr justified')
 @click.option('--beta', default=0.5, help='Hyperparameter beta')
 @click.option('--num_iter', default=20, help='Number of iterations')
@@ -59,8 +59,10 @@ def get_backtracking_params(op_name):
                    "ResNet18, ResNet34, MobileNetV2, SENet18, PreActResNet18, DenseNet121, LeNet, "
                    "GoogLeNet, ShuffleNet, VGG, NIN, AlexNet, SmallNet")
 @click.option('--dataset', default='FashionMNIST', required=True, help='Dataset to evaluate',
-              type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST', 'ImageNette', 'ImageWoof', 'TinyImageNet']))
-def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_justified, beta, num_iter, momentum, resume, nets, dataset):
+              type=click.Choice(
+                  ['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST', 'ImageNette', 'ImageWoof', 'TinyImageNet']))
+def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_justified, beta, num_iter, momentum, resume,
+                    nets, dataset):
     global best_loss, loss_avg, history, patient_test, patient_train, patient, optimizer, apply, alpha, best_acc
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -100,13 +102,15 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
             'MMT': optim.SGD(net.parameters(), lr=lr_start, momentum=momentum),
             'NAG': optim.SGD(net.parameters(), lr=lr_start, momentum=momentum, nesterov=True),
         }
+
         # Loop for optimizers:
         for op_name in optimizers.keys():
             alpha, once_only, apply = get_backtracking_params(op_name)
             optimizer = optimizers[op_name]
 
             # Global variables
-            history_path = save_dir + net_name + '_d' + str(dataset) + '_b' + str(batch_size) + '_history_MBT-' + op_name + '_BT=' + str(use_backtracking) + '.json'
+            history_path = save_dir + net_name + '_d' + str(dataset) + '_b' + str(
+                batch_size) + '_history_MBT-' + op_name + '_BT=' + str(use_backtracking) + '.json'
             patient_train = 0  # number of epochs waiting for improvement of training loss
             patient_test = 0  # number of epochs waiting for improvement of validation accuracy
             patient = 0  # basically min of patient_train and  patient_test
@@ -171,6 +175,7 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
                     optimizer.zero_grad()
                     outputs = net(inputs)
                     loss = criterion(outputs, targets)
+
                     loss.backward()
                     optimizer.step()
 
@@ -253,7 +258,9 @@ def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_just
 
                     all_history[op_name][lr_start] = history
                     json.dump(history, open(history_path, 'w'), indent=2)
-                    json.dump(all_history, open(f"history/models/all_models{str(net_name)}_d{str(dataset)}_b{str(batch_size)}_BT={str(use_backtracking)}.pickle", 'w'),
+                    json.dump(all_history, open(
+                        f"history/models/all_models{str(net_name)}_d{str(dataset)}_b{str(batch_size)}_BT={str(use_backtracking)}.pickle",
+                        'w'),
                               indent=2)
 
 

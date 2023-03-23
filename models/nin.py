@@ -33,6 +33,12 @@ class NIN(nn.Module):
                 nn.AvgPool2d(kernel_size=8, stride=1, padding=0),
                 )
 
+        # Initialize
+        for m in self.classifier.modules():
+            if isinstance(m, nn.Conv2d):
+                m.weight.data.normal_(0, 0.05)
+                m.bias.data.normal_(0, 0.0)
+
     def forward(self, x):
         x = self.classifier(x)
         x = x.view(x.size(0), self.num_classes)
