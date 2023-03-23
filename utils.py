@@ -16,6 +16,8 @@ import torchvision
 import torchvision.transforms as transforms
 
 from models import *
+from datasets import tinyimagenet, imagenette
+from models.smallnet import SmallNet
 
 
 def count_parameters(model):
@@ -47,6 +49,8 @@ def get_model(net_name, num_classes):
         return NIN(num_classes=num_classes)
     elif net_name == 'AlexNet':
         return AlexNet(num_classes=num_classes)
+    elif net_name == 'SmallNet':
+        return SmallNet(num_classes=num_classes)
 
 
 def get_dataset(dataset, batch_size):
@@ -93,20 +97,16 @@ def get_dataset(dataset, batch_size):
 
     elif dataset == 'MNIST':
         transform_train = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.Resize((28, 28)),
             torchvision.transforms.Grayscale(num_output_channels=3),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomAffine(10),
-            transforms.RandomRotation(20),
             torchvision.transforms.ToTensor()
         ])
 
         transform_test = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.Resize((28, 28)),
             torchvision.transforms.Grayscale(num_output_channels=3),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomAffine(10),
-            transforms.RandomRotation(20),
             torchvision.transforms.ToTensor()
         ])
 
@@ -115,27 +115,77 @@ def get_dataset(dataset, batch_size):
 
     elif dataset == 'FashionMNIST':
         transform_train = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.Resize((28, 28)),
             torchvision.transforms.Grayscale(num_output_channels=3),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomAffine(10),
-            transforms.RandomRotation(20),
             torchvision.transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
 
         transform_test = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+            transforms.Resize((28, 28)),
             torchvision.transforms.Grayscale(num_output_channels=3),
             transforms.RandomHorizontalFlip(),
-            transforms.RandomAffine(10),
-            transforms.RandomRotation(20),
             torchvision.transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
 
         trainset = torchvision.datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform_train)
         testset = torchvision.datasets.FashionMNIST(root='./data', train=False, download=True, transform=transform_test)
+
+    elif dataset == 'TinyImageNet':
+        transform_train = transforms.Compose([
+            transforms.Resize((64, 64)),
+            transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+
+        transform_test = transforms.Compose([
+            transforms.Resize((64, 64)),
+            transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+
+        trainset = tinyimagenet.TinyImageNet(root='./data', split='train', download=True, transform=transform_train)
+        testset = tinyimagenet.TinyImageNet(root='./data', split='val', download=True, transform=transform_test)
+
+    elif dataset == 'ImageNette':
+        transform_train = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+
+        transform_test = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+
+        trainset = imagenette.ImageNette(root='./data', split='train', download=True, transform=transform_train)
+        testset = imagenette.ImageNette(root='./data', split='val', download=True, transform=transform_test)
+
+    elif dataset == 'ImageWoof':
+        transform_train = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+
+        transform_test = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.RandomHorizontalFlip(),
+            torchvision.transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        ])
+
+        trainset = imagenette.ImageWoof(root='./data', split='train', download=True, transform=transform_train)
+        testset = imagenette.ImageWoof(root='./data', split='val', download=True, transform=transform_test)
 
     # If we have train, test sets already
     if loaded_dataset is None:

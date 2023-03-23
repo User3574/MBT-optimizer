@@ -33,9 +33,9 @@ import json, pickle, click
 @click.option('--net_name', default='ResNet18',
               help="Choose specific network architecture: "
                    "ResNet18, ResNet34, MobileNetV2, SENet18, PreActResNet18, DenseNet121, LeNet, "
-                   "GoogLeNet, ShuffleNet, VGG, NIN, AlexNet")
+                   "GoogLeNet, ShuffleNet, VGG, NIN, AlexNet, SmallNet")
 @click.option('--dataset', default='CIFAR10', required=True, help='Dataset to evaluate',
-              type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST']))
+              type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST', 'ImageNette', 'ImageWoof', 'TinyImageNet']))
 def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_name, dataset):
     global best_loss, loss_avg, history, patient_test, patient_train, patient, optimizer, apply, alpha, best_acc
     all_lr_starts = [100, 10, 1, 0.1, 0.01, 0.001, 1e-4, 1e-5, 1e-6]
@@ -94,7 +94,8 @@ def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_nam
         'RMSprop': optim.RMSprop(net.parameters(), lr=lr_start),
         'Adam': optim.Adam(net.parameters(), lr=lr_start),
         'Adamax': optim.Adamax(net.parameters(), lr=lr_start),
-        'INNA': INNA(net.parameters(), lr=lr_start)
+        'INNA': INNA(net.parameters(), lr=lr_start),
+        'LBFGS': optim.LBFGS(net.parameters(), lr=lr_start),
     }
 
     all_history = {}

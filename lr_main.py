@@ -34,9 +34,9 @@ from lr_backtrack import LRFinder
 @click.option('--net_name', default='ResNet18',
               help="Choose specific network architecture: "
                    "ResNet18, ResNet34, MobileNetV2, SENet18, PreActResNet18, DenseNet121, LeNet, "
-                   "GoogLeNet, ShuffleNet, VGG, NIN, AlexNet")
+                   "GoogLeNet, ShuffleNet, VGG, NIN, AlexNet, SmallNet")
 @click.option('--dataset', default='FashionMNIST', required=True, help='Dataset to evaluate',
-              type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST']))
+              type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST', 'ImageNette', 'ImageWoof', 'TinyImageNet']))
 def run_experiments(lr_justified, alpha, beta, num_iter, resume, net_name, dataset):
     all_batch_sizes = [12, 25, 50, 100, 200, 400, 800]
     all_lr_starts = [100, 10, 1, 0.1, 0.01, 0.001, 1e-4, 1e-5, 1e-6]

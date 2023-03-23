@@ -57,9 +57,9 @@ def get_backtracking_params(op_name):
 @click.option('--nets', default='LeNet', callback=lambda _, __, x: x.split(',') if x else [],
               help="Choose specific network architecture: "
                    "ResNet18, ResNet34, MobileNetV2, SENet18, PreActResNet18, DenseNet121, LeNet, "
-                   "GoogLeNet, ShuffleNet, VGG, NIN, AlexNet")
+                   "GoogLeNet, ShuffleNet, VGG, NIN, AlexNet, SmallNet")
 @click.option('--dataset', default='FashionMNIST', required=True, help='Dataset to evaluate',
-              type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST']))
+              type=click.Choice(['CIFAR10', 'CIFAR100', 'MNIST', 'FashionMNIST', 'ImageNette', 'ImageWoof', 'TinyImageNet']))
 def run_experiments(start_epoch, batch_size, lr_start, use_backtracking, lr_justified, beta, num_iter, momentum, resume, nets, dataset):
     global best_loss, loss_avg, history, patient_test, patient_train, patient, optimizer, apply, alpha, best_acc
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
