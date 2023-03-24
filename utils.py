@@ -97,14 +97,14 @@ def get_dataset(dataset, batch_size):
 
     elif dataset == 'MNIST':
         transform_train = transforms.Compose([
-            transforms.Resize((28, 28)),
+            transforms.Resize((32, 32)),
             torchvision.transforms.Grayscale(num_output_channels=3),
             transforms.RandomHorizontalFlip(),
             torchvision.transforms.ToTensor()
         ])
 
         transform_test = transforms.Compose([
-            transforms.Resize((28, 28)),
+            transforms.Resize((32, 32)),
             torchvision.transforms.Grayscale(num_output_channels=3),
             transforms.RandomHorizontalFlip(),
             torchvision.transforms.ToTensor()
@@ -115,19 +115,19 @@ def get_dataset(dataset, batch_size):
 
     elif dataset == 'FashionMNIST':
         transform_train = transforms.Compose([
-            transforms.Resize((28, 28)),
+            transforms.Resize((32, 32)),
             torchvision.transforms.Grayscale(num_output_channels=3),
             transforms.RandomHorizontalFlip(),
             torchvision.transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
 
         transform_test = transforms.Compose([
-            transforms.Resize((28, 28)),
+            transforms.Resize((32, 32)),
             torchvision.transforms.Grayscale(num_output_channels=3),
             transforms.RandomHorizontalFlip(),
             torchvision.transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
 
         trainset = torchvision.datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform_train)
