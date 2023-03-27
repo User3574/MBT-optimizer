@@ -130,15 +130,28 @@ def run_experiments(start_epoch, batch_size, lr_start, momentum, resume, net_nam
                 patient = min([patient_test, patient_train])
                 print('\nEpoch: %d' % epoch)
 
-                net.train()
-                pbar = tqdm(enumerate(trainloader))
-                for batch_idx, (inputs, targets) in pbar:
-                    inputs, targets = inputs.to(device), targets.to(device)
+                # Closure to calculate the gradient
+                def closure():
                     optimizer.zero_grad()
                     outputs = net(inputs)
                     loss = criterion(outputs, targets)
                     loss.backward()
-                    optimizer.step()
+                    return loss
+
+                net.train()
+                pbar = tqdm(enumerate(trainloader))
+                for batch_idx, (inputs, targets) in pbar:
+                    inputs, targets = inputs.to(device), targets.to(device)
+
+                    # optimizer.zero_grad()
+                    # outputs = net(inputs)
+                    # loss = criterion(outputs, targets)
+                    # loss.backward()
+                    # optimizer.step()
+
+                    optimizer.step(closure)
+                    loss = closure()
+                    outputs = net(inputs)
 
                     train_loss += loss.item()
                     _, predicted = outputs.max(1)

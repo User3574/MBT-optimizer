@@ -23,6 +23,5 @@ class SmallNet(nn.Module):
         return x
 
 
-def nin(num_classes=10):
+def smallnet(num_classes=10):
     return SmallNet(num_classes)
-
